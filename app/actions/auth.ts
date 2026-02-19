@@ -18,7 +18,7 @@ export async function signUp(formData: FormData) {
         return { error: error.message };
     }
 
-    redirect("/dashboard");
+    redirect("/");
 }
 
 export async function signIn(prevState: { error?: string } | null, formData: FormData) {

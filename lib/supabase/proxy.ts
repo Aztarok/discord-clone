@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
     // IMPORTANT: If you remove getClaims() and you use server-side rendering
     // with the Supabase client, your users may be randomly logged out.
     const pathname = request.nextUrl.pathname;
-    const protectRoot = true;
+    const protectRoot = false;
     const protectedRoutes = ["/dashboard", "/account", "/admin"];
     const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
     const isRootProtected = protectRoot && pathname === "/";
