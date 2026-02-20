@@ -10,6 +10,8 @@ const page = () => {
     const [friend, setFriend] = useState("");
     const [pendingRequests, setPendingRequests] = useState<any[]>([]);
     const [loadingPending, setLoadingPending] = useState(false);
+    const [friends, setFriends] = useState<any[]>([]);
+    const [loadingFriends, setLoadingFriends] = useState(false);
 
     const router = useRouter();
 
@@ -21,6 +23,9 @@ const page = () => {
     useEffect(() => {
         if (tab === 2) {
             fetchPendingRequests();
+        }
+        if (tab === 0 || tab === 1) {
+            fetchFriends();
         }
     }, [tab]);
 
@@ -131,6 +136,54 @@ const page = () => {
         console.log("Friend request accepted!");
     };
 
+    const fetchFriends = async () => {
+        const supabase = createClient();
+        setLoadingFriends(true);
+
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+            setLoadingFriends(false);
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from("friendships")
+            .select(
+                `
+            id,
+            requester_id,
+            addressee_id,
+            requester:profiles!friendships_requester_id_fkey (
+                id,
+                username,
+                is_online
+            ),
+            addressee:profiles!friendships_addressee_id_fkey (
+                id,
+                username,
+                is_online
+            )
+        `,
+            )
+            .eq("status", "accepted")
+            .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+
+        if (error) {
+            console.error(error.message);
+        } else {
+            const mappedFriends = data.map((f: any) => {
+                return f.requester_id === user.id ? f.addressee : f.requester;
+            });
+
+            setFriends(mappedFriends);
+        }
+
+        setLoadingFriends(false);
+    };
+
     return (
         <div className="flex-1 flex flex-col min-w-0">
             <div className="flex h-screen bg-zinc-950 text-white overflow-hidden">
@@ -164,6 +217,56 @@ const page = () => {
 
                     <div className="space-y-4">
                         {/* Placeholder – replace with real DM list, online friends, etc. */}
+                        {tab === 0 && (
+                            <div className="space-y-3">
+                                {loadingFriends && <p className="text-zinc-400">Loading...</p>}
+
+                                {!loadingFriends &&
+                                    friends.filter((f) => f.is_online).length === 0 && (
+                                        <p className="text-zinc-400">No friends online.</p>
+                                    )}
+
+                                {friends
+                                    .filter((f) => f.is_online)
+                                    .map((friend) => (
+                                        <div
+                                            key={friend.id}
+                                            className="bg-zinc-900 p-4 rounded-lg flex justify-between items-center"
+                                        >
+                                            <p>{friend.username}</p>
+                                            <span className="text-green-400 text-sm">Online</span>
+                                        </div>
+                                    ))}
+                            </div>
+                        )}
+                        {tab === 1 && (
+                            <div className="space-y-3">
+                                {loadingFriends && <p className="text-zinc-400">Loading...</p>}
+
+                                {!loadingFriends && friends.length === 0 && (
+                                    <p className="text-zinc-400">You have no friends yet.</p>
+                                )}
+
+                                {friends.map((friend) => (
+                                    <div
+                                        key={friend.id}
+                                        className="bg-zinc-900 p-4 rounded-lg flex justify-between items-center"
+                                    >
+                                        <p>{friend.username}</p>
+
+                                        <span
+                                            className={`text-sm ${
+                                                friend.is_online
+                                                    ? "text-green-400"
+                                                    : "text-zinc-500"
+                                            }`}
+                                        >
+                                            {friend.is_online ? "Online" : "Offline"}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                         {tab === 2 && (
                             <div className="space-y-3">
                                 {loadingPending && <p className="text-zinc-400">Loading...</p>}
