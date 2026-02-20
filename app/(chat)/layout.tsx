@@ -1,12 +1,10 @@
 // app/(chat)/layout.tsx
 "use client"; // ← important – we need hooks
 
-import { useSelectedLayoutSegments } from "next/navigation";
-import ServerSidebar from "@/components/chat/ServerSidebar";
 import ChannelSidebar from "@/components/chat/ChannelSidebar";
 import ChatHeader from "@/components/chat/ChatHeader";
-import ChatArea from "@/components/chat/ChatArea";
-import ChatInput from "@/components/chat/ChatInput";
+import ServerSidebar from "@/components/chat/ServerSidebar";
+import { useSelectedLayoutSegments } from "next/navigation";
 // import FriendsPage from './friends/page';   // if you want to import directly
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {

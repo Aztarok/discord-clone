@@ -14,7 +14,7 @@ export default async function Home() {
 
     // If user is signed in → redirect to friends page immediately
     if (user) {
-        redirect("/friends"); // ← change to your actual friends/DMs route
+        redirect("/chat"); // ← change to your actual friends/DMs route
         // or redirect('/chat') if that's where your chat/friends UI lives
     }
 

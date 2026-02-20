@@ -36,7 +36,7 @@ export async function signIn(prevState: { error?: string } | null, formData: For
         return { error: error.message };
     }
 
-    redirect("/dashboard");
+    redirect("/");
 }
 
 export async function signOut(): Promise<void> {

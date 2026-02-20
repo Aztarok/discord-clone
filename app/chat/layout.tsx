@@ -25,29 +25,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             <DirectMessagesSidebar />
 
             {/* Main area – conditional content */}
-            <div className="flex-1 flex flex-col min-w-0">
-                {isInChannelView ? (
-                    <>{children}</>
-                ) : (
-                    // No server/channel selected → show friends/DMs page
-                    <div className="flex h-screen bg-zinc-950 text-white overflow-hidden">
-                        <div className="flex-1 overflow-y-auto p-6">
-                            {/* You can render children here too if using /friends/page.tsx */}
-                            {/* Or hard-code/import your friends component: */}
-                            <h2 className="text-2xl font-bold mb-6">Friends / Direct Messages</h2>
-                            <div className="space-y-4">
-                                {/* Placeholder – replace with real DM list, online friends, etc. */}
-                                <div className="bg-zinc-900 p-4 rounded-lg">
-                                    <p className="text-zinc-400">
-                                        No conversations yet. Start chatting!
-                                    </p>
-                                </div>
-                                {/* ... more DM items */}
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <>{children}</>
 
             {/* Optional members sidebar – only in channel view */}
             {isInChannelView && (

@@ -9,21 +9,30 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ChatInput() {
-    const { channelId } = useParams();
+    const { serverId } = useParams();
     const [content, setContent] = useState("");
     const [sending, setSending] = useState(false);
+    console.log(serverId);
 
     const handleSend = async () => {
-        if (!content.trim() || !channelId) return;
+        if (!content.trim() || !serverId) return;
+        console.log("hi");
 
         setSending(true);
         const supabase = createClient();
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) return;
 
         const { data, error, status } = await supabase.from("messages").insert({
-            channel_id: channelId,
+            user: user.id,
+            channelId: "Youtube",
+            channel_id: serverId,
             content: content.trim(),
         });
-        console.log(channelId);
+        console.log(serverId);
         console.log(data, error, status);
         if (error) {
             console.error(error);
