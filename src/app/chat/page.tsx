@@ -187,10 +187,10 @@ const page = () => {
     return (
         <div className="flex-1 flex flex-col min-w-0">
             <div className="flex h-screen bg-zinc-950 text-white overflow-hidden">
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto ">
                     {/* You can render children here too if using /friends/page.tsx */}
                     {/* Or hard-code/import your friends component: */}
-                    <div className="flex mb-6 border-b pb-5 border-zinc-500 items-center">
+                    <div className="flex mb-6 border-b pb-5 h-18 p-4 border-zinc-800 items-center">
                         <h2 className="text-lg font-bold">Friends / Direct Messages</h2>
 
                         <span className="flex gap-3 items-center ml-5">
@@ -215,7 +215,7 @@ const page = () => {
                         </span>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 px-4">
                         {/* Placeholder – replace with real DM list, online friends, etc. */}
                         {tab === 0 && (
                             <div className="space-y-3">
