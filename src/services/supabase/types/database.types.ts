@@ -211,7 +211,7 @@ export type Database = {
             foreignKeyName: "messages_channel_id_fkey"
             columns: ["channel_id"]
             isOneToOne: false
-            referencedRelation: "channels"
+            referencedRelation: "servers"
             referencedColumns: ["id"]
           },
           {
@@ -299,6 +299,7 @@ export type Database = {
           id: string
           name: string
           owner_id: string
+          type: string
         }
         Insert: {
           created_at?: string | null
@@ -306,6 +307,7 @@ export type Database = {
           id?: string
           name: string
           owner_id: string
+          type?: string
         }
         Update: {
           created_at?: string | null
@@ -313,6 +315,7 @@ export type Database = {
           id?: string
           name?: string
           owner_id?: string
+          type?: string
         }
         Relationships: [
           {
@@ -350,7 +353,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      accept_friend_and_create_server: {
+        Args: { friendship_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

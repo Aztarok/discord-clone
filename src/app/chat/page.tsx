@@ -29,6 +29,36 @@ const page = () => {
         }
     }, [tab]);
 
+    const acceptFriend = async (friendshipId: string) => {
+        const supabase = createClient();
+
+        const { error: updateError } = await supabase
+            .from("friendships")
+            .update({ status: "accepted" })
+            .eq("id", friendshipId);
+
+        if (updateError) {
+            console.error(updateError);
+            return;
+        }
+
+        const { data: serverId, error: rpcError } = await supabase.rpc(
+            "accept_friend_and_create_server",
+            {
+                friendship_id: friendshipId,
+            },
+        );
+
+        if (rpcError) {
+            console.error(rpcError);
+            return;
+        }
+        console.log("Server ID:", serverId);
+        // fetchPendingRequests(); // this is the new server_id
+        // fetchFriends();
+        // router.push(`/chat/${serverId}`);
+    };
+
     const handleAddFriend = async () => {
         if (!friend) return;
         console.log("Adding friend...");
@@ -284,7 +314,7 @@ const page = () => {
 
                                         <div className="flex gap-2">
                                             <Button
-                                                onClick={() => handleAccept(request.id)}
+                                                onClick={() => acceptFriend(request.id)}
                                                 size="sm"
                                                 className="bg-green-600"
                                             >

@@ -5,20 +5,97 @@ import { BsPersonRaisedHand } from "react-icons/bs";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
+import { Friend, Friendship } from "@/lib/types/Friends";
 const DirectMessagesSidebar = () => {
     const supabase = createClient();
-    type Friend = {
-        id: string;
-        username: string;
+
+    type DirectMessage = {
+        serverId: string;
+        otherUser: {
+            id: string;
+            username: string;
+        };
     };
-    type Friendship = {
-        requester_id: string;
-        addressee_id: string;
-        status: string;
-    };
+
     const [friends, setFriends] = useState<Friend[]>([]);
+    const [dms, setDms] = useState<DirectMessage[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
+    const getDirectMessages = async () => {
+        setLoading(true);
+
+        try {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
+
+            if (!user) return;
+
+            const { data: memberships, error } = await supabase
+                .from("server_members")
+                .select(`server_id, servers!inner(id, type)`)
+                .eq("user_id", user.id)
+                .eq("servers.type", "dm");
+
+            if (error || !memberships) {
+                console.error(error);
+                return null;
+            }
+            console.log("memberships", memberships);
+
+            const serverIds = memberships
+                .map((m) => m.server_id)
+                .filter((id): id is string => id !== null);
+
+            if (serverIds.length === 0) {
+                setDms([]);
+                return;
+            }
+
+            const { data: members } = await supabase
+                .from("server_members")
+                .select("server_id, user_id")
+                .in("server_id", serverIds);
+
+            console.log("members", members);
+            if (!members) {
+                setDms([]);
+                return;
+            }
+
+            const otherUserIds = members.filter((m) => m.user_id !== user.id).map((m) => m.user_id);
+            console.log("otherUserIds", otherUserIds);
+            const { data: profiles } = await supabase
+                .from("profiles")
+                .select("id, username")
+                .in("id", otherUserIds as string[]);
+
+            if (!profiles) return;
+
+            const formatted: DirectMessage[] = serverIds.map((serverId) => {
+                const otherMember = members.find(
+                    (m) => m.server_id === serverId && m.user_id !== user.id,
+                );
+
+                const profile = profiles.find((p) => p.id === otherMember?.user_id);
+                console.log("profile", profiles);
+                return {
+                    serverId,
+                    otherUser: {
+                        id: profile?.id ?? "",
+                        username: profile?.username ?? "Unknown",
+                    },
+                };
+            });
+            console.log(formatted);
+
+            setDms(formatted);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
     const getFriends = async () => {
         setLoading(true);
         try {
@@ -56,7 +133,7 @@ const DirectMessagesSidebar = () => {
         }
     };
     useEffect(() => {
-        getFriends();
+        getDirectMessages();
     }, []);
 
     return (
@@ -78,14 +155,14 @@ const DirectMessagesSidebar = () => {
                     <div className="w-6 h-6 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
                 </div>
             )}
-            {friends.map((friend) => (
-                <Link href={`/chat/${friend.id}`} key={friend.id}>
+            {dms.map((dm) => (
+                <Link href={`/chat/${dm.serverId}`} key={dm.serverId}>
                     <div className="flex overflow-hidden object-contain items-center gap-1 px-2 py-1 cursor-pointer hover:bg-zinc-800 rounded-[5px] w-[90%] mx-auto">
                         <Avatar className="w-10 h-10 rounded-full">
                             {/* <AvatarImage src={friend.image} alt="youtube" /> */}
-                            <AvatarFallback>{"YT"}</AvatarFallback>
+                            <AvatarFallback>{"K"}</AvatarFallback>
                         </Avatar>
-                        <p className="font-semibold p-2">{friend.username}</p>
+                        <p className="font-semibold p-2">{dm.otherUser.username}</p>
                     </div>
                 </Link>
             ))}

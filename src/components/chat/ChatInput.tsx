@@ -7,6 +7,7 @@ import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { UUID } from "crypto";
 
 export default function ChatInput() {
     const { serverId } = useParams();
@@ -26,13 +27,14 @@ export default function ChatInput() {
 
         if (!user) return;
 
+        console.log("serverId", serverId);
         const { data, error, status } = await supabase.from("messages").insert({
-            user: user.id,
-            channelId: "Youtube",
-            channel_id: serverId,
             content: content.trim(),
+            user_id: user.id,
+            channel_id: serverId as string,
+            attachments: [],
         });
-        console.log(serverId);
+
         console.log(data, error, status);
         if (error) {
             console.error(error);
