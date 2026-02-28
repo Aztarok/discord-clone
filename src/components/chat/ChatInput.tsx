@@ -1,13 +1,12 @@
-// components/chat/ChatInput.tsx
+// // components/chat/ChatInput.tsx
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
-import { Send } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
-import { UUID } from "crypto";
+import { Send } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 
 export default function ChatInput() {
     const { serverId } = useParams();
@@ -31,7 +30,7 @@ export default function ChatInput() {
         const { data, error, status } = await supabase.from("messages").insert({
             content: content.trim(),
             user_id: user.id,
-            channel_id: serverId as string,
+            server_id: serverId as string,
             attachments: [],
         });
 
@@ -74,3 +73,32 @@ export default function ChatInput() {
         </div>
     );
 }
+
+// interface ChatInputProps {
+//     onSend: (content: string) => void;
+// }
+
+// const ChatInput = ({ onSend }: ChatInputProps) => {
+//     const [value, setValue] = useState("");
+
+//     const handleSubmit = (e: React.FormEvent) => {
+//         e.preventDefault();
+//         if (!value.trim()) return;
+
+//         onSend(value);
+//         setValue("");
+//     };
+
+//     return (
+//         <form onSubmit={handleSubmit}>
+//             <input
+//                 value={value}
+//                 onChange={(e) => setValue(e.target.value)}
+//                 className="w-full p-2"
+//                 placeholder="Message..."
+//             />
+//         </form>
+//     );
+// };
+
+// export default ChatInput;

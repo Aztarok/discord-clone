@@ -14,92 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      channels: {
-        Row: {
-          created_at: string | null
-          id: string
-          name: string
-          server_id: string | null
-          type: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          name: string
-          server_id?: string | null
-          type?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          name?: string
-          server_id?: string | null
-          type?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "channels_server_id_fkey"
-            columns: ["server_id"]
-            isOneToOne: false
-            referencedRelation: "servers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      chat_room: {
-        Row: {
-          created_at: string
-          id: string
-          is_public: boolean
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_public: boolean
-          name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_public?: boolean
-          name?: string
-        }
-        Relationships: []
-      }
-      chat_room_member: {
-        Row: {
-          chat_room_id: string
-          created_at: string
-          member_id: string
-        }
-        Insert: {
-          chat_room_id: string
-          created_at?: string
-          member_id: string
-        }
-        Update: {
-          chat_room_id?: string
-          created_at?: string
-          member_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_room_member_chat_room_id_fkey"
-            columns: ["chat_room_id"]
-            isOneToOne: false
-            referencedRelation: "chat_room"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "chat_room_member_member_id_fkey"
-            columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       friendships: {
         Row: {
           addressee_id: string
@@ -139,77 +53,38 @@ export type Database = {
           },
         ]
       }
-      message: {
-        Row: {
-          author_id: string
-          chat_room_id: string
-          created_at: string
-          id: string
-          text: string
-        }
-        Insert: {
-          author_id: string
-          chat_room_id: string
-          created_at?: string
-          id?: string
-          text: string
-        }
-        Update: {
-          author_id?: string
-          chat_room_id?: string
-          created_at?: string
-          id?: string
-          text?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "message_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "message_chat_room_id_fkey"
-            columns: ["chat_room_id"]
-            isOneToOne: false
-            referencedRelation: "chat_room"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       messages: {
         Row: {
           attachments: Json | null
-          channel_id: string | null
           content: string
           created_at: string | null
           id: string
+          server_id: string
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
           attachments?: Json | null
-          channel_id?: string | null
           content: string
           created_at?: string | null
           id?: string
+          server_id: string
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           attachments?: Json | null
-          channel_id?: string | null
           content?: string
           created_at?: string | null
           id?: string
+          server_id?: string
           updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "messages_channel_id_fkey"
-            columns: ["channel_id"]
+            columns: ["server_id"]
             isOneToOne: false
             referencedRelation: "servers"
             referencedColumns: ["id"]
@@ -258,22 +133,22 @@ export type Database = {
           id: string
           joined_at: string | null
           role: string | null
-          server_id: string | null
-          user_id: string | null
+          server_id: string
+          user_id: string
         }
         Insert: {
           id?: string
           joined_at?: string | null
           role?: string | null
-          server_id?: string | null
-          user_id?: string | null
+          server_id: string
+          user_id: string
         }
         Update: {
           id?: string
           joined_at?: string | null
           role?: string | null
-          server_id?: string | null
-          user_id?: string | null
+          server_id?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -326,27 +201,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      user_profile: {
-        Row: {
-          created_at: string
-          id: string
-          image_url: string | null
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_url?: string | null
-          name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_url?: string | null
-          name?: string
-        }
-        Relationships: []
       }
     }
     Views: {
