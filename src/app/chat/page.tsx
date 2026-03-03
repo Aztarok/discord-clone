@@ -53,7 +53,6 @@ const page = () => {
             console.error(rpcError);
             return;
         }
-        console.log("Server ID:", serverId);
         // fetchPendingRequests(); // this is the new server_id
         // fetchFriends();
         // router.push(`/chat/${serverId}`);
@@ -61,8 +60,6 @@ const page = () => {
 
     const handleAddFriend = async () => {
         if (!friend) return;
-        console.log("Adding friend...");
-        console.log(friend);
         const supabase = createClient();
         const {
             data: { user },
@@ -78,7 +75,6 @@ const page = () => {
             .select("id")
             .eq("username", friend)
             .single();
-        console.log(otherUser);
 
         if (userError || !otherUser) {
             console.error("User not found");
@@ -101,7 +97,6 @@ const page = () => {
             return;
         }
         setFriend("");
-        console.log("Friend request sent!");
     };
 
     const handleLogout = async () => {
@@ -116,7 +111,6 @@ const page = () => {
             .select("id")
             .eq("username", "Azleath")
             .single();
-        console.log(data);
     };
     const fetchPendingRequests = async () => {
         const supabase = createClient();
@@ -162,8 +156,6 @@ const page = () => {
         if (error) {
             console.error(error.message);
         }
-
-        console.log("Friend request accepted!");
     };
 
     const fetchFriends = async () => {

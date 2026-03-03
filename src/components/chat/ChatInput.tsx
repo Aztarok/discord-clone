@@ -12,11 +12,9 @@ export default function ChatInput() {
     const { serverId } = useParams();
     const [content, setContent] = useState("");
     const [sending, setSending] = useState(false);
-    console.log(serverId);
 
     const handleSend = async () => {
         if (!content.trim() || !serverId) return;
-        console.log("hi");
 
         setSending(true);
         const supabase = createClient();
@@ -26,15 +24,12 @@ export default function ChatInput() {
 
         if (!user) return;
 
-        console.log("serverId", serverId);
         const { data, error, status } = await supabase.from("messages").insert({
             content: content.trim(),
             user_id: user.id,
             server_id: serverId as string,
             attachments: [],
         });
-
-        console.log(data, error, status);
         if (error) {
             console.error(error);
             setSending(false);

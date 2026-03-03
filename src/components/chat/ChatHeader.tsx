@@ -5,8 +5,6 @@ import { useParams } from "next/navigation";
 import { Hash } from "lucide-react";
 
 export default function ChatHeader({ serverId }: { serverId?: string }) {
-    console.log(serverId);
-
     // In real app → fetch channel name from supabase or context
     const channelName = serverId; // placeholder — replace with real data
 

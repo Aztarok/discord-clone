@@ -6,8 +6,6 @@ import { useParams } from "next/navigation";
 
 const page = () => {
     const { serverId } = useParams();
-    console.log(serverId);
-    console.log(typeof serverId);
 
     return (
         <div className="bg-blue-500 flex flex-col min-w-0 flex-1">

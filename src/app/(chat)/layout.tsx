@@ -9,7 +9,6 @@ import { useSelectedLayoutSegments } from "next/navigation";
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
     const segments = useSelectedLayoutSegments();
-    console.log(segments);
 
     // segments examples:
     // []                     → root / (or /friends if you have friends/page.tsx)

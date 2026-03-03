@@ -31,7 +31,6 @@ export const getFriends = async () => {
             .from("profiles")
             .select("id, username")
             .in("id", friendIds);
-        console.log(profiles);
         return (profiles as Friend[]) ?? [];
     } catch (error) {
         console.error(error);

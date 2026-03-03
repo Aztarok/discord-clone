@@ -41,7 +41,6 @@ const DirectMessagesSidebar = () => {
                 console.error(error);
                 return null;
             }
-            console.log("memberships", memberships);
 
             const serverIds = memberships
                 .map((m) => m.server_id)
@@ -57,14 +56,17 @@ const DirectMessagesSidebar = () => {
                 .select("server_id, user_id")
                 .in("server_id", serverIds);
 
-            console.log("members", members);
             if (!members) {
                 setDms([]);
                 return;
             }
-
-            const otherUserIds = members.filter((m) => m.user_id !== user.id).map((m) => m.user_id);
-            console.log("otherUserIds", otherUserIds);
+            const otherUserIds = serverIds
+                .map(
+                    (serverId) =>
+                        members.find((m) => m.server_id === serverId && m.user_id !== user.id)
+                            ?.user_id,
+                )
+                .filter((id): id is string => !!id);
             const { data: profiles } = await supabase
                 .from("profiles")
                 .select("id, username")
@@ -78,7 +80,6 @@ const DirectMessagesSidebar = () => {
                 );
 
                 const profile = profiles.find((p) => p.id === otherMember?.user_id);
-                console.log("profile", profiles);
                 return {
                     serverId,
                     otherUser: {
@@ -87,7 +88,6 @@ const DirectMessagesSidebar = () => {
                     },
                 };
             });
-            console.log(formatted);
 
             setDms(formatted);
         } catch (error) {
@@ -125,7 +125,6 @@ const DirectMessagesSidebar = () => {
                 .select("id, username")
                 .in("id", friendIds);
             setFriends((profiles as Friend[]) ?? []);
-            console.log(profiles);
         } catch (error) {
             console.error(error);
         } finally {

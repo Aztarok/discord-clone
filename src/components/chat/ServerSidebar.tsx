@@ -36,7 +36,6 @@ export default function ServerSidebar() {
                 .select("server_id, servers!inner(id, name, icon_url, type)")
                 .eq("user_id", user.id)
                 .eq("servers.type", "server");
-            console.log("servers", data);
 
             setServers(data?.map((m: any) => m.servers) || []);
             setLoading(false);
