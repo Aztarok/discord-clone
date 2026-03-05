@@ -6,7 +6,7 @@ import { CurrentUser } from "@/services/supabase/types/User";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BsPersonRaisedHand } from "react-icons/bs";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 type Props = {
     user: CurrentUser | null;
@@ -21,6 +21,7 @@ const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
         otherUser: {
             id: string;
             username: string;
+            avatar_url?: string | null;
         };
     };
 
@@ -76,9 +77,10 @@ const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
                 .filter((id): id is string => !!id);
             const { data: profiles } = await supabase
                 .from("profiles")
-                .select("id, username")
+                .select("id, username, avatar_url")
                 .in("id", otherUserIds as string[]);
 
+            console.log("members", profiles);
             if (!profiles) return;
 
             const formatted: DirectMessage[] = serverIds.map((serverId) => {
@@ -92,6 +94,7 @@ const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
                     otherUser: {
                         id: profile?.id ?? "",
                         username: profile?.username ?? "Unknown",
+                        avatar_url: profile?.avatar_url ?? null,
                     },
                 };
             });
@@ -129,7 +132,7 @@ const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
 
             const { data: profiles } = await supabase
                 .from("profiles")
-                .select("id, username")
+                .select("id, username, avatar_url")
                 .in("id", friendIds);
             setFriends((profiles as Friend[]) ?? []);
         } catch (error) {
@@ -166,9 +169,9 @@ const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
                     <Link href={`/chat/${dm.serverId}`} key={dm.serverId}>
                         <div className="flex overflow-hidden object-contain items-center gap-1 px-2 py-1 cursor-pointer hover:bg-zinc-800 rounded-[5px] w-[90%] mx-auto">
                             <Avatar className="w-10 h-10 rounded-full">
-                                {/* <AvatarImage src={friend.image} alt="youtube" /> */}
+                                <AvatarImage src={dm.otherUser.avatar_url ?? ""} alt="youtube" />
                                 <AvatarFallback>
-                                    {user?.auth.email?.[0].toUpperCase()}
+                                    {user?.auth?.email?.[0].toUpperCase() ?? ""}
                                 </AvatarFallback>
                             </Avatar>
                             <p className="font-semibold p-2">{dm.otherUser.username}</p>
@@ -179,7 +182,10 @@ const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
             <div className="h-18 border-t border-zinc-800 flex items-center justify-between px-3 bg-zinc-900">
                 <div className="flex items-center gap-2">
                     <Avatar className="w-9 h-9">
-                        <AvatarFallback>{user?.profile.username?.[0].toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={user?.profile.avatar_url!} alt="profile image" />
+                        <AvatarFallback>
+                            {user?.profile.username?.[0].toUpperCase() ?? ""}
+                        </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col leading-tight">
                         <span className="text-sm font-semibold">{user?.profile.username}</span>

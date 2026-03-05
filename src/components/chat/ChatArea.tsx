@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { createClient } from "@/lib/supabase/client";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 type Message = {
     id: string;
@@ -105,7 +106,8 @@ export default function ChatArea() {
                 created_at,
                 user_id,
                 profiles!inner (
-                    username
+                    username,
+                    avatar_url
                 )
             `,
             )
@@ -146,7 +148,7 @@ export default function ChatArea() {
                 async (payload) => {
                     const { data: profile } = await supabase
                         .from("profiles")
-                        .select("username")
+                        .select("username, avatar_url")
                         .eq("id", payload.new.user_id)
                         .single();
 
@@ -154,7 +156,7 @@ export default function ChatArea() {
                         ...payload.new,
                         profiles: {
                             username: profile?.username ?? "Unknown",
-                            avatar_url: profile?.username ?? null,
+                            avatar_url: profile?.avatar_url ?? null,
                         },
                     } as Message;
 
@@ -182,7 +184,16 @@ export default function ChatArea() {
             <div className="space-y-4">
                 {messages.map((msg) => (
                     <div key={msg.id} className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-zinc-700 shrink-0" />
+                        {/* <div className="w-10 h-10 rounded-full bg-zinc-700 shrink-0" /> */}
+                        <Avatar>
+                            <AvatarImage
+                                src={msg.profiles?.avatar_url ?? ""}
+                                alt={msg.profiles?.username ?? "User"}
+                            />
+                            <AvatarFallback>
+                                {msg.profiles?.username?.charAt(0) ?? "U"}
+                            </AvatarFallback>
+                        </Avatar>
                         <div>
                             <div className="flex items-baseline gap-2">
                                 <span className="font-semibold">

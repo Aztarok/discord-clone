@@ -8,8 +8,10 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
+import { CurrentUser } from "@/services/supabase/types/User";
 
 type Props = {
+    user: CurrentUser;
     open: boolean;
     onClose: () => void;
 };
@@ -19,14 +21,14 @@ type UserProfile = {
     username?: string;
 };
 
-export default function SettingsModal({ open, onClose }: Props) {
+export default function SettingsModal({ user, open, onClose }: Props) {
     const supabase = createClient();
 
     const [username, setUsername] = useState("");
-    const [user, setUser] = useState<UserProfile | null>(null);
     const [darkMode, setDarkMode] = useState(true);
     const [notifications, setNotifications] = useState(true);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [avatar, setAvatar] = useState<File | null>(null);
 
     const getUser = async () => {
         const {
@@ -34,25 +36,63 @@ export default function SettingsModal({ open, onClose }: Props) {
         } = await supabase.auth.getUser();
         if (!user) return;
 
-        setUser({
-            id: user.id,
-            email: user.email ?? "",
-            username: user.user_metadata.username ?? "",
-        });
+        // setUser({
+        //     id: user.id,
+        //     email: user.email ?? "",
+        //     username: user.user_metadata.username ?? "",
+        // });
         setUsername(user.user_metadata.username ?? "");
     };
-    useEffect(() => {
-        getUser();
-    }, []);
+    // useEffect(() => {
+    //     getUser();
+    // }, []);
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        setAvatar(file);
 
         const reader = new FileReader();
         reader.onloadend = () => {
             setImagePreview(reader.result as string);
         };
         reader.readAsDataURL(file);
+    };
+    const uploadAvatar = async () => {
+        if (!avatar || !user) return null;
+
+        const fileExt = avatar.name.split(".").pop();
+        const filePath = `${user.auth.id}`;
+
+        const { error } = await supabase.storage
+            .from("avatars")
+            .upload(filePath, avatar, { upsert: true });
+
+        if (error) {
+            console.error(error);
+            return null;
+        }
+
+        const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+        console.log(data);
+        return data.publicUrl;
+    };
+
+    const saveChanges = async () => {
+        if (!user) return;
+        let avatarUrl = user.profile.avatar_url;
+
+        if (avatar) {
+            avatarUrl = await uploadAvatar();
+        }
+
+        await supabase
+            .from("profiles")
+            .update({
+                avatar_url: avatarUrl,
+            })
+            .eq("id", user.auth.id);
+        onClose();
     };
 
     return (
@@ -92,9 +132,11 @@ export default function SettingsModal({ open, onClose }: Props) {
                                 {/* Avatar Section */}
                                 <div className="flex items-center gap-4">
                                     <Avatar className="w-20 h-20">
-                                        <AvatarImage src={imagePreview ?? ""} />
+                                        <AvatarImage
+                                            src={imagePreview ?? user.profile.avatar_url ?? ""}
+                                        />
                                         <AvatarFallback>
-                                            {username ? username[0] : "D"}
+                                            {user.profile.username[0] ?? ""}
                                         </AvatarFallback>
                                     </Avatar>
 
@@ -115,13 +157,16 @@ export default function SettingsModal({ open, onClose }: Props) {
                                 <div>
                                     <label className="text-sm text-white">Username</label>
                                     <Input
-                                        className="mt-2 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-transparent focus-visible:border-black focus-visible:border-2"
+                                        className="mt-2 text-white placeholder:text-white focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-transparent focus-visible:border-black focus-visible:border-2"
                                         value={username}
+                                        placeholder={`${user.profile.username}`}
                                         onChange={(e) => setUsername(e.target.value)}
                                     />
                                 </div>
 
-                                <Button className="w-full cursor-pointer">Save Changes</Button>
+                                <Button onClick={saveChanges} className="w-full cursor-pointer">
+                                    Save Changes
+                                </Button>
                             </div>
                         </TabsContent>
 

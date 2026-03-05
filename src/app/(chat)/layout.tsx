@@ -55,7 +55,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             {isInChannelView && (
                 // <MemberSidebar />
                 <div className="w-60 bg-zinc-900 border-l border-zinc-800 p-4 text-zinc-400">
-                    Members (coming soon)
+                    Members
                 </div>
             )}
         </div>

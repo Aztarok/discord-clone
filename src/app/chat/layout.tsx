@@ -27,7 +27,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             // 1️⃣ Fetch profile
             const { data: profile } = await supabase
                 .from("profiles")
-                .select("username")
+                .select("username, avatar_url")
                 .eq("id", authUser.id)
                 .single();
 
@@ -37,7 +37,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 auth: authUser,
                 profile: {
                     username: profile.username ?? "",
-                    avatar_url: null,
+                    avatar_url: profile.avatar_url ?? null,
                 },
             });
         };
@@ -77,7 +77,11 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 </div>
             )}
             {settingsOpen && (
-                <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+                <SettingsModal
+                    user={currentUser}
+                    open={settingsOpen}
+                    onClose={() => setSettingsOpen(false)}
+                />
             )}
         </div>
     );

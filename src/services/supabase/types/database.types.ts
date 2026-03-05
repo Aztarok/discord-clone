@@ -57,33 +57,33 @@ export type Database = {
         Row: {
           attachments: Json | null
           content: string
-          created_at: string | null
+          created_at: string
           id: string
           server_id: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           attachments?: Json | null
           content: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           server_id: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           attachments?: Json | null
           content?: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           server_id?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "messages_channel_id_fkey"
+            foreignKeyName: "messages_server_id_fkey"
             columns: ["server_id"]
             isOneToOne: false
             referencedRelation: "servers"
@@ -101,6 +101,7 @@ export type Database = {
       profiles: {
         Row: {
           age: number | null
+          avatar_url: string | null
           created_at: string | null
           email: string | null
           id: string
@@ -110,6 +111,7 @@ export type Database = {
         }
         Insert: {
           age?: number | null
+          avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           id: string
@@ -119,6 +121,7 @@ export type Database = {
         }
         Update: {
           age?: number | null
+          avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
@@ -211,6 +214,7 @@ export type Database = {
         Args: { friendship_id: string }
         Returns: string
       }
+      is_member_of_server: { Args: { _server_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
