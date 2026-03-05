@@ -41,7 +41,7 @@ export default function ChatInput() {
     };
 
     return (
-        <div className="p-4 bg-zinc-900 border-t border-zinc-800">
+        <div className="h-18 p-4 bg-zinc-900 border-t border-zinc-800">
             <form
                 onSubmit={(e) => {
                     e.preventDefault();

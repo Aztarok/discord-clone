@@ -1,12 +1,19 @@
 "use client";
 
-import Link from "next/link";
-import { BsPersonRaisedHand } from "react-icons/bs";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
 import { Friend, Friendship } from "@/lib/types/Friends";
-const DirectMessagesSidebar = () => {
+import { CurrentUser } from "@/services/supabase/types/User";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { BsPersonRaisedHand } from "react-icons/bs";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+
+type Props = {
+    user: CurrentUser | null;
+    onOpenSettings: () => void;
+};
+
+const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
     const supabase = createClient();
 
     type DirectMessage = {
@@ -136,7 +143,7 @@ const DirectMessagesSidebar = () => {
     }, []);
 
     return (
-        <div className="w-72 bg-zinc-950 flex flex-col border-r border-zinc-800">
+        <div className="w-72 bg-zinc-950 flex flex-col border-r border-zinc-800 h-full">
             <div className="flex flex-col gap-4 h-18 border-b border-zinc-800 justify-center">
                 <Link href={"/chat"}>
                     <span className="flex flex-row bg-zinc-800 justify-center items-center hover:cursor-pointer hover:bg-zinc-900 rounded-[5px] w-[90%] mx-auto">
@@ -149,22 +156,44 @@ const DirectMessagesSidebar = () => {
                 <p className="text-gray-500 font-medium text-[14px]">Direct Messages</p>
                 <p className="text-gray-500 font-bold text-[18px]">+</p>
             </div>
-            {loading && (
-                <div className="flex justify-center py-4">
-                    <div className="w-6 h-6 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
-                </div>
-            )}
-            {dms.map((dm) => (
-                <Link href={`/chat/${dm.serverId}`} key={dm.serverId}>
-                    <div className="flex overflow-hidden object-contain items-center gap-1 px-2 py-1 cursor-pointer hover:bg-zinc-800 rounded-[5px] w-[90%] mx-auto">
-                        <Avatar className="w-10 h-10 rounded-full">
-                            {/* <AvatarImage src={friend.image} alt="youtube" /> */}
-                            <AvatarFallback>{"K"}</AvatarFallback>
-                        </Avatar>
-                        <p className="font-semibold p-2">{dm.otherUser.username}</p>
+            <div className="flex-1 overflow-y-auto">
+                {loading && (
+                    <div className="flex justify-center py-4">
+                        <div className="w-6 h-6 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
                     </div>
-                </Link>
-            ))}
+                )}
+                {dms.map((dm) => (
+                    <Link href={`/chat/${dm.serverId}`} key={dm.serverId}>
+                        <div className="flex overflow-hidden object-contain items-center gap-1 px-2 py-1 cursor-pointer hover:bg-zinc-800 rounded-[5px] w-[90%] mx-auto">
+                            <Avatar className="w-10 h-10 rounded-full">
+                                {/* <AvatarImage src={friend.image} alt="youtube" /> */}
+                                <AvatarFallback>
+                                    {user?.auth.email?.[0].toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
+                            <p className="font-semibold p-2">{dm.otherUser.username}</p>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+            <div className="h-18 border-t border-zinc-800 flex items-center justify-between px-3 bg-zinc-900">
+                <div className="flex items-center gap-2">
+                    <Avatar className="w-9 h-9">
+                        <AvatarFallback>{user?.profile.username?.[0].toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col leading-tight">
+                        <span className="text-sm font-semibold">{user?.profile.username}</span>
+                        <span className="text-xs text-green-400">Online</span>
+                    </div>
+                </div>
+
+                <button
+                    onClick={onOpenSettings}
+                    className="text-zinc-400 hover:text-white transition cursor-pointer size-8"
+                >
+                    ⚙
+                </button>
+            </div>
         </div>
     );
 };
