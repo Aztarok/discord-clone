@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
 import { CurrentUser } from "@/services/supabase/types/User";
+import { useRouter } from "next/navigation";
 
 type Props = {
     user: CurrentUser;
@@ -23,6 +24,7 @@ type UserProfile = {
 
 export default function SettingsModal({ user, open, onClose }: Props) {
     const supabase = createClient();
+    const router = useRouter();
 
     const [username, setUsername] = useState("");
     const [darkMode, setDarkMode] = useState(true);
@@ -58,41 +60,126 @@ export default function SettingsModal({ user, open, onClose }: Props) {
         };
         reader.readAsDataURL(file);
     };
-    const uploadAvatar = async () => {
-        if (!avatar || !user) return null;
+    // const uploadAvatar = async () => {
+    //     if (!avatar || !user) return null;
 
-        const fileExt = avatar.name.split(".").pop();
-        const filePath = `${user.auth.id}`;
+    //     // if (user.profile.avatar_url) {
+    //     //     const path = user.profile.avatar_url.split("/avatars/")[1];
+    //     //     console.log("path", path);
+    //     //     const { data, error } = await supabase.storage.from("avatars").remove([path]);
+    //     //     if (error) {
+    //     //         console.error(error);
+    //     //         console.log("error deleting", data);
+    //     //         console.log("error deleting", error);
+    //     //         return null;
+    //     //     }
+    //     //     console.log("deleted", data);
+    //     // }
 
-        const { error } = await supabase.storage
-            .from("avatars")
-            .upload(filePath, avatar, { upsert: true });
+    //     const fileExt = avatar.name.split(".").pop();
+    //     const filePath = `${user.auth.id}/avatar.${fileExt}`;
+
+    //     const { error } = await supabase.storage
+    //         .from("avatars")
+    //         .upload(filePath, avatar, { upsert: true });
+
+    //     if (error) {
+    //         console.error(error);
+    //         return null;
+    //     }
+
+    //     const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+    //     console.log(data);
+    //     return data.publicUrl;
+    // };
+
+    // const saveChanges = async () => {
+    //     if (!user) return;
+    //     let avatarUrl = user.profile.avatar_url;
+
+    //     if (avatar) {
+    //         const uploadedUrl = await uploadAvatar();
+
+    //         if (uploadedUrl) {
+    //             avatarUrl = uploadedUrl;
+    //         }
+    //         console.log("avatarUrl", avatarUrl);
+    //     }
+
+    //     const { error } = await supabase
+    //         .from("profiles")
+    //         .update({
+    //             avatar_url: avatarUrl,
+    //             username: username || user.profile.username,
+    //         })
+    //         .eq("id", user.auth.id);
+
+    //     if (error) {
+    //         console.error(error);
+    //         return null;
+    //     }
+    //     onClose();
+    // };
+
+    const deleteOldAvatar = async () => {
+        if (!user.profile.avatar_url) return;
+
+        const path = user.profile.avatar_url.split("/avatars/")[1];
+
+        const { error } = await supabase.storage.from("avatars").remove([path]);
 
         if (error) {
-            console.error(error);
+            console.error("Delete error:", error);
+        }
+    };
+
+    const uploadAvatar = async () => {
+        if (!avatar) return null;
+
+        const fileExt = avatar.name.split(".").pop();
+        const filePath = `${user.auth.id}/avatar.${fileExt}`;
+
+        const { error } = await supabase.storage.from("avatars").upload(filePath, avatar, {
+            upsert: true,
+        });
+
+        if (error) {
+            console.error("Upload error:", error);
             return null;
         }
 
         const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-        console.log(data);
-        return data.publicUrl;
+
+        return `${data.publicUrl}?t=${Date.now()}`;
     };
 
     const saveChanges = async () => {
         if (!user) return;
+
         let avatarUrl = user.profile.avatar_url;
 
         if (avatar) {
-            avatarUrl = await uploadAvatar();
+            await deleteOldAvatar();
+
+            const newUrl = await uploadAvatar();
+            if (newUrl) avatarUrl = newUrl;
         }
 
-        await supabase
+        const { error } = await supabase
             .from("profiles")
             .update({
                 avatar_url: avatarUrl,
+                username: username || user.profile.username,
             })
             .eq("id", user.auth.id);
+
+        if (error) {
+            console.error("Update error:", error);
+            return;
+        }
+
         onClose();
+        router.push("/");
     };
 
     return (
