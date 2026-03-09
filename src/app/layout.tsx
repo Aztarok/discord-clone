@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { url } from "inspector";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -15,6 +16,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "Chatterbox",
     description: "Chat with friends",
+    openGraph: {
+        title: "Chatterbox",
+        description: "Chat with friends",
+        url: "https://discord-clone-seven-jet.vercel.app/",
+        images: [
+            {
+                url: "https://files.catbox.moe/i2szcz.png",
+                width: 1200,
+                height: 630,
+            },
+        ],
+    },
 };
 
 export default function RootLayout({
