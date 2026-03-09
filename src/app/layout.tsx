@@ -22,7 +22,7 @@ export const metadata: Metadata = {
         url: "https://discord-clone-seven-jet.vercel.app/",
         images: [
             {
-                url: "https://files.catbox.moe/i2szcz.png",
+                url: "/chatterbox_snapshot.png",
                 width: 1200,
                 height: 630,
             },
