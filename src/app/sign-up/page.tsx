@@ -13,7 +13,14 @@ export default function SignUpPage() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        if (!avatar) return;
 
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        formData.set("avatar", avatar);
+    };
     const handleImagePreview = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -34,7 +41,7 @@ export default function SignUpPage() {
                     Sign up with your email and password
                 </p>
 
-                <form action={setFormAction} className="space-y-4">
+                <form action={setFormAction} className="space-y-4" onSubmit={handleSubmit}>
                     {/* Username */}
                     <div>
                         <label className="mb-1 block text-sm text-neutral-300">Username</label>
