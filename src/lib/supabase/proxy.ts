@@ -38,7 +38,7 @@ export async function updateSession(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const protectRoot = false;
     const signedOutRoutes = ["/dashboard", "/admin", "/chat"];
-    const signedInRoutes = ["/sign-up", "sign-in"];
+    const signedInRoutes = ["/sign-up", "/sign-in"];
     const isRootProtected = protectRoot && pathname === "/";
 
     const { data } = await supabase.auth.getClaims();
@@ -60,7 +60,7 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    if (user && isSignedInPath) {
+    if (user && (isSignedInPath || pathname === "/")) {
         const url = request.nextUrl.clone();
         url.pathname = "/chat";
         return NextResponse.redirect(url);
