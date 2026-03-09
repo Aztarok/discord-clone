@@ -10,6 +10,9 @@ export default function SignUpPage() {
     const [formAction, setFormAction] = useActionState(signUp, null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [avatar, setAvatar] = useState<File | null>(null);
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const handleImagePreview = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -40,6 +43,8 @@ export default function SignUpPage() {
                             type="text"
                             required
                             className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-white outline-none transition focus:border-white"
+                            onChange={(e) => setUsername(e.target.value)}
+                            value={username}
                         />
                     </div>
                     {/* Email */}
@@ -50,6 +55,8 @@ export default function SignUpPage() {
                             type="email"
                             required
                             className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-white outline-none transition focus:border-white"
+                            onChange={(e) => setEmail(e.target.value)}
+                            value={email}
                         />
                     </div>
 
@@ -61,6 +68,8 @@ export default function SignUpPage() {
                             type="password"
                             required
                             className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-white outline-none transition focus:border-white"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
                         />
                     </div>
                     {/* Profile Picture */}

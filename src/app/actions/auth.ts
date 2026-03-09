@@ -20,6 +20,16 @@ export async function signUp(prevState: { error?: string } | null, formData: For
 
     const { username, email, password, avatar } = result.data;
 
+    const { data: existing } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("username", username)
+        .maybeSingle();
+
+    if (existing) {
+        return { error: "Username already taken" };
+    }
+
     const { data: signUpData, error } = await supabase.auth.signUp({
         email,
         password,
