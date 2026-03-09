@@ -183,9 +183,7 @@ const DirectMessagesSidebar = ({ user, onOpenSettings }: Props) => {
                 <div className="flex items-center gap-2">
                     <Avatar className="w-9 h-9">
                         <AvatarImage src={user?.profile.avatar_url!} alt="profile image" />
-                        <AvatarFallback>
-                            {user?.profile.username?.[0].toUpperCase() ?? ""}
-                        </AvatarFallback>
+                        <AvatarFallback>{user?.profile?.username ?? "A"}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col leading-tight">
                         <span className="text-sm font-semibold">{user?.profile.username}</span>
