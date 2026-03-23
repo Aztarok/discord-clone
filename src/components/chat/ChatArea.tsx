@@ -203,7 +203,7 @@ export default function ChatArea() {
                                     {new Date(msg.created_at).toLocaleTimeString([], {
                                         hour: "2-digit",
                                         minute: "2-digit",
-                                        month: "short",
+                                        month: "long",
                                         day: "numeric",
                                     })}
                                 </span>
@@ -221,7 +221,7 @@ export default function ChatArea() {
 function formatMessageDate(dateStr: string): string {
     const date = new Date(dateStr);
     return date.toLocaleString([], {
-        month: "short",
+        month: "long",
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit",

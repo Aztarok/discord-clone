@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { set } from "zod";
 
 const page = () => {
     const [tab, setTab] = useState(0);
@@ -12,6 +13,7 @@ const page = () => {
     const [loadingPending, setLoadingPending] = useState(false);
     const [friends, setFriends] = useState<any[]>([]);
     const [loadingFriends, setLoadingFriends] = useState(false);
+    const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
     const router = useRouter();
 
@@ -30,6 +32,8 @@ const page = () => {
     }, [tab]);
 
     const acceptFriend = async (friendshipId: string) => {
+        if (acceptingId === friendshipId) return;
+        setAcceptingId(friendshipId);
         const supabase = createClient();
 
         const { error: updateError } = await supabase
@@ -42,10 +46,13 @@ const page = () => {
             return;
         }
 
+        setAcceptingId(null);
+
         const { data: serverId, error: rpcError } = await supabase.rpc(
             "accept_friend_and_create_server",
             {
                 friendship_id: friendshipId,
+                server_type: "dm",
             },
         );
 
@@ -129,10 +136,10 @@ const page = () => {
             .from("friendships")
             .select(
                 `
-      id,
-      requester_id,
-      profiles!friendships_requester_id_fkey ( username )
-    `,
+                    id,
+                    requester_id,
+                    profiles!friendships_requester_id_fkey ( username )
+                `,
             )
             .eq("addressee_id", user.id)
             .eq("status", "pending");
@@ -307,6 +314,7 @@ const page = () => {
                                         <div className="flex gap-2">
                                             <Button
                                                 onClick={() => acceptFriend(request.id)}
+                                                disabled={acceptingId === request.id}
                                                 size="sm"
                                                 className="bg-green-600"
                                             >

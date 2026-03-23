@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { Send } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function ChatInput() {
     const { serverId } = useParams();
     const [content, setContent] = useState("");
     const [sending, setSending] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const handleSend = async () => {
         if (!content.trim() || !serverId) return;
@@ -38,6 +39,8 @@ export default function ChatInput() {
 
         setContent("");
         setSending(false);
+
+        inputRef.current?.focus();
     };
 
     return (
@@ -50,11 +53,11 @@ export default function ChatInput() {
                 className="flex items-center gap-2"
             >
                 <Input
+                    ref={inputRef}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Message..."
                     className="bg-zinc-800 border-zinc-700 focus-visible:ring-emerald-600"
-                    disabled={sending}
                 />
                 <Button
                     type="submit"
