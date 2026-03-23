@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 import { SignUpSchema } from "@/lib/validation/auth";
+import { success } from "zod";
 
 export async function signUp(prevState: { error?: string } | null, formData: FormData) {
     const supabase = await createServer();
@@ -94,7 +95,7 @@ export async function signIn(prevState: { error?: string } | null, formData: For
         return { error: error.message };
     }
 
-    redirect("/");
+    return { success: true };
 }
 
 export async function signOut(): Promise<void> {

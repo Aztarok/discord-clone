@@ -105,7 +105,7 @@ export default function SignUpPage() {
                     </div>
                     <button
                         type="submit"
-                        className="w-full rounded-lg bg-white py-2 font-medium text-black transition hover:bg-neutral-200"
+                        className="w-full rounded-lg bg-white py-2 font-medium text-black transition hover:bg-neutral-200 cursor-pointer"
                     >
                         Sign Up
                     </button>

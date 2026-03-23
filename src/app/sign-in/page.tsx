@@ -1,18 +1,42 @@
 "use client";
 
 import { signIn } from "@/app/actions/auth";
+import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 
 export default function SignInPage() {
-    const [formAction, setFormAction] = useActionState(signIn, null);
+    const router = useRouter();
+    const [formState, setformState] = useActionState(signIn, null);
+    const supabase = createClient();
+    const { pending } = useFormStatus();
+    useEffect(() => {
+        const handleLogin = async () => {
+            if (formState?.success) {
+                // 🔑 wait until session is actually ready
+                await new Promise((r) => setTimeout(r, 50));
+                const {
+                    data: { session },
+                } = await supabase.auth.getSession();
+
+                if (session) {
+                    router.replace("/chat"); // 👈 use replace (important)
+                }
+            }
+        };
+
+        handleLogin();
+    }, [formState, router, supabase]);
     return (
         <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-6">
             <div className="w-full max-w-md rounded-2xl bg-neutral-900 p-8 shadow-2xl shadow-black/40">
                 <h1 className="mb-2 text-3xl font-semibold text-white">Welcome Back</h1>
                 <p className="mb-6 text-sm text-neutral-400">Sign in to your account</p>
 
-                <form action={setFormAction} className="space-y-4">
+                <form action={setformState} className="space-y-4">
                     <div>
                         <label className="mb-1 block text-sm text-neutral-300">Email</label>
                         <input
@@ -34,15 +58,16 @@ export default function SignInPage() {
                     </div>
 
                     <div className="text-red-500 font-bold">
-                        {formAction?.error && <p>{formAction.error}</p>}
+                        {formState?.error && <p>{formState.error}</p>}
                     </div>
 
-                    <button
+                    <Button
                         type="submit"
-                        className="w-full rounded-lg bg-white py-2 font-medium text-black transition hover:bg-neutral-200"
+                        disabled={pending}
+                        className="w-full rounded-lg bg-white py-2 font-medium text-black transition hover:bg-neutral-200 disabled:opacity-50 cursor-pointer"
                     >
-                        Sign In
-                    </button>
+                        {pending ? "Signing in..." : "Sign In"}
+                    </Button>
                 </form>
 
                 <p className="mt-6 text-sm text-neutral-400">
@@ -53,5 +78,18 @@ export default function SignInPage() {
                 </p>
             </div>
         </div>
+    );
+}
+function SubmitButton() {
+    const { pending } = useFormStatus();
+
+    return (
+        <button
+            type="submit"
+            disabled={pending}
+            className="w-full rounded-lg bg-white py-2 font-medium text-black transition hover:bg-neutral-200 disabled:opacity-50"
+        >
+            {pending ? "Signing in..." : "Sign In"}
+        </button>
     );
 }

@@ -41,27 +41,25 @@ export async function updateSession(request: NextRequest) {
     const signedInRoutes = ["/sign-up", "/sign-in"];
     const isRootProtected = protectRoot && pathname === "/";
 
-    const { data } = await supabase.auth.getClaims();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
-    const user = data?.claims;
+    const isSignedInPath = signedInRoutes.some((route) => pathname.startsWith(route));
+    const isSignedOutPath = signedOutRoutes.some((route) => pathname.startsWith(route));
 
-    const isSignedInPath = signedInRoutes.some((route) => pathname.includes(route));
-    const isSignedOutPath = signedOutRoutes.some((route) => pathname.includes(route));
+    const url = request.nextUrl.clone();
+    if (!user && isSignedOutPath) {
+        // allow short grace period for auth hydration
+        const isAuthCallback = request.nextUrl.searchParams.get("code");
 
-    if (
-        !user &&
-        (isSignedOutPath || isRootProtected)
-        // !request.nextUrl.pathname.startsWith("/login") &&
-        // !request.nextUrl.pathname.startsWith("/auth")
-    ) {
-        // no user, potentially respond by redirecting the user to the login page
-        const url = request.nextUrl.clone();
-        url.pathname = "/sign-in";
-        return NextResponse.redirect(url);
+        if (!isAuthCallback) {
+            url.pathname = "/sign-in";
+            return NextResponse.redirect(url);
+        }
     }
 
-    if (user && (isSignedInPath || pathname === "/")) {
-        const url = request.nextUrl.clone();
+    if (user && isSignedInPath) {
         url.pathname = "/chat";
         return NextResponse.redirect(url);
     }
