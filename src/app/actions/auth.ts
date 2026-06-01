@@ -1,9 +1,8 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 import { SignUpSchema } from "@/lib/validation/auth";
-import { success } from "zod";
+import { redirect } from "next/navigation";
 
 export async function signUp(prevState: { error?: string } | null, formData: FormData) {
     const supabase = await createServer();

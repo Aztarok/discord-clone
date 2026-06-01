@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { set } from "zod";
 
 const page = () => {
     const [tab, setTab] = useState(0);

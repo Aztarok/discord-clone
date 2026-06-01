@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 export default function SignInPage() {
+    const supabase = createClient();
     const router = useRouter();
     const [formState, setformState] = useActionState(signIn, null);
-    const supabase = createClient();
     const { pending } = useFormStatus();
+    const [showPassword, setShowPassword] = useState(false);
+
     useEffect(() => {
         const handleLogin = async () => {
             if (formState?.success) {

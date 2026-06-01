@@ -9,6 +9,19 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "../ui/dialog";
+import { Field, FieldGroup } from "../ui/field";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 type Server = {
     id: string;
@@ -104,21 +117,52 @@ export default function ServerSidebar() {
                     ))
                 )}
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="w-12 h-12 rounded-2xl bg-zinc-700 hover:bg-zinc-600 text-emerald-500 hover:cursor-pointer"
-                            onClick={() => {
-                                /* open create server dialog */
-                            }}
-                        >
-                            <Plus className="h-6 w-6" />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Create a Server</TooltipContent>
-                </Tooltip>
+                <Dialog>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="w-12 h-12 rounded-2xl bg-zinc-700 hover:bg-zinc-600 text-emerald-500 hover:cursor-pointer"
+                                >
+                                    <Plus className="h-6 w-6" />
+                                </Button>
+                            </DialogTrigger>
+                        </TooltipTrigger>
+
+                        <TooltipContent side="right">
+                            <p>Create Server</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    <DialogContent className="sm:max-w-sm">
+                        <DialogHeader>
+                            <DialogTitle>Create a new server</DialogTitle>
+                            <DialogDescription>
+                                Give your server a name to get started.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <FieldGroup>
+                            <Field>
+                                <Label htmlFor="server-name">Server Name</Label>
+                                <Input id="server-name" name="name" placeholder="My Server" />
+                            </Field>
+                        </FieldGroup>
+
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline" className="hover:cursor-pointer">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <Button type="submit" className="hover:cursor-pointer">
+                                Create Server
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </TooltipProvider>
     );
